@@ -1,0 +1,38 @@
+PYROSTIA: Free Weekly Menu Planner
+
+<h2>Download Pyrostia: Open Source PHP/MySQL Software</h2>
+
+	<h3>What is it?</h3>	
+	<p>Pyrostia is a free weekly menu planner helping you plan your meals and manage a grocery list. For more info check the <a href="http://calendarscripts.info/pyrostia/about">about page</a> or
+	<a href="http://calendarscripts.info/pyrostia/">just sign up and try it</a> to see how it works.</p>
+	
+	<h3>Technology and Requirements.</h3>
+	<p>Pyrostia is based on PHP and MySQL so your server must have these installed. The minimum PHP version required is 5.0, and the minimum MySQL version required is also 5.0.</p>
+
+	<p>Pyrostia also uses jQuery and <a href="http://knockoutjs.com/" target="_blank">Knockout.js</a> to power modern interactive user-interface and to reduce server-side load.</p>
+
+	<h3>Download</h3>
+	<p>You can download the source code of Pyrostia <a href="http://calendarscripts.info/free/pyrostia_v1.0.zip">here (176 KB)</a> and install it on your server.</p>
+
+	<h3>Install</h3>
+	<p>In the first version installation is manual and requires the following steps:</p>
+
+	<ol>
+		<li>Create a database for Pyrostia</li>
+		<li>Open inc/mysql_wrapper.inc.php and edit the database details on lines 10-13</li>
+		<li>Import pyrostia.sql file into the created database in the first step.</li>
+		<li>Run the following query:<br><br>
+
+		INSERT INTO `pyr_settings` (`name`, `value`) VALUES ('site_url', 'YOUR INSTALLATION URL HERE');<br><br>
+
+		But first replace "YOUR INSTALLATION URL HERE" with the URL where you have installed the software. Make sure the trailing slash IS INCLUDED.</li>
+
+		<li>That's it, you can register yourself and/or let your website users register themselves and use the menu planner.</li>
+	</ol>
+	
+
+	<h3>Modify The Design</h3>
+	<p>Pyrostia UI is built with HTML5 and uses mostly CSS based design. To modify the CSS you need to edit the file <b>css/screen.css</b>, and to modify the HTML code you need to carefully edit the files in "views" folder. The layout is in master.html and the other files present partial views.</p>
+
+	<h3>License</h3>
+	<p>Pyrostia is licenced under MIT license and you can use it in commercial projects.</p>
