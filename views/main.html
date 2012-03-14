@@ -1,0 +1,64 @@
+<div id="main">
+<h2>Use This Free Menu Planner To Manage Your Healthy Meals And Weekly Grocery List:</h2>
+
+<ul>
+    <li>Quick and easy meal management</li>
+    <li>Automated recognition of your ingredients. Add them to the grocery list with a single click</li>
+    <li>Completely free and accessible anywhere</li>
+</ul>
+
+<p><img src="<?=SITE_URL."img/screenshot.png"?>" alt="Pyrostia Screenshot" style="border:1px solid black;"></p>
+</div>
+
+<aside id="sidebar">
+    <div class="form">
+        <?php if($error):?>
+        <p class="error"><?=$err_msg;?></p>
+        <?php endif;?>
+        <form method="post" id="signUpForm" onsubmit="return validateForm(this);">
+        <h2>New Users Sign Up</h2>
+        <div>Email Address: <br /><input type="text" name="email"></div>
+        <div>Password: <br /><input type="password" name="pass"></div>
+        <div><input type="submit" value="Sign Up" name="register"></div>
+        <input type="hidden" name="website">
+        </form>
+    </div>
+    
+    <div class="form">
+        <form method="post" id="loginForm" action="<?=SITE_URL?>pyrostia" onsubmit="return validateForm(this);">
+        <h2>Members Sign-In</h2>
+        <div>Email Address: <br /><input type="text" name="email"></div>
+        <div>Password: <br /><input type="password" name="pass"></div>
+        <div><input type="submit" value="Sign In" name="login"></div>
+        <input type="hidden" name="website">
+        </form>
+    </div>
+</aside>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {    
+    $('#signUpForm input[name=website]').val('pyrostia/calendar');
+    $('#loginForm input[name=website]').val('pyrostia/calendar');
+});    
+
+function validateForm(frm)
+{
+    if(!checkMail(frm.email.value))
+    {
+        alert("Please enter valid email address");
+        frm.email.focus();
+        return false;
+    }
+    
+    passStr=new String(frm.pass.value);
+    
+    if(passStr.length<6)
+    {
+        alert("Your password should be at least 6 characters long");
+        frm.pass.focus();
+        return false;
+    }
+    
+    return true;
+}
+</script>

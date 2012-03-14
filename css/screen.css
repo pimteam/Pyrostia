@@ -1,0 +1,98 @@
+body
+{
+    width:980px;
+    margin:auto;   
+}
+
+#hd1 h1
+{
+    color:#ED9121;
+}
+
+#hd1 nav
+{
+    float:right;
+}
+
+#hd1 nav ul 
+{
+    margin: 0;
+    padding: 0;
+    list-style-type:none;
+}
+
+#hd1 nav ul li
+{
+    float:left;
+    margin-left:15px;
+    border:1px solid black;
+    padding:5px;
+}
+
+#hd1 nav ul li a
+{
+    text-decoration:none;
+}
+
+#f1
+{
+    clear:both;
+    margin-top:50px;
+    text-align:center;
+}
+
+#main {float:left;width:720px;min-height:500px;}
+
+#sidebar
+{
+    float:left;
+    width:200px;
+    padding:10px;    
+}
+
+.form label
+{
+    width:130px;
+    float:left;
+    display:block;
+}
+
+.form div
+{
+    margin-top:5px;
+    margin-bottom:5px;
+    clear:both;
+}
+
+.form textarea {width:250px;height:100px;}
+
+.error
+{
+    color:red;
+}
+
+.calendar th
+{
+    min-width:110px;
+    padding:5px;
+    background:#ED9121;
+    color:white;
+    font-weight:bold;
+}
+
+.calendar tr:nth-child(odd)
+{
+    background:#EEE;
+}
+
+.calendar td {height:50px;vertical-align:top}
+.calendar td.date {cursor:default;}
+
+.ajax
+{
+    display:none;
+    position:absolute;
+    padding:5px;
+    background:#FFF;
+    border:1pt solid black;   
+}

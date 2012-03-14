@@ -1,0 +1,12 @@
+Installation instructions:
+
+1. Create a database for Pyrostia
+2. Open inc/mysql_wrapper.inc.php and edit the database details on lines 10-13
+3. Import pyrostia.sql file into the created database in the first step.
+4. Run the following query:
+
+INSERT INTO `pyr_settings` (`name`, `value`) VALUES ('site_url', 'YOUR INSTALLATION URL HERE');
+
+But first replace "YOUR INSTALLATION URL HERE" with the URL where you have installed the software. Make sure the trailing slash IS INCLUDED.
+
+5. That's it, you can register yourself and/or let your website users register themselves and use the menu planner.

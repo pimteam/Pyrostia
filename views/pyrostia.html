@@ -1,0 +1,316 @@
+<div id="main">
+    <p align="center"><a href="#" onclick="viewModel.moveCalendar('backward');return false;">&lt;&lt;</a>
+    <span data-bind="text: viewModel.monthname"></span> / <span data-bind="text: viewModel.year"></span>
+    <a href="#" onclick="viewModel.moveCalendar('forward');return false;">&gt;&gt;</a></p>
+    <p align="center" data-bind='template: "weeksTemplate"'></p>
+
+    <div style="margin:auto;" data-bind='template: "calendarTemplate"'></div>    
+</div>
+
+<div id="sidebar" data-bind="visible: viewModel.groceries().length>0">
+    <h2>Grocery List</h2>
+
+	<p>To buy this week:</p>
+    
+    <table>
+	<thead>
+		<tr><th width="150">Item</th><th width="120">I have this!</th></tr>
+	</thead>
+	<tbody data-bind='template: { name:"groceryTemplate", foreach: viewModel.groceries() }'>
+	</tbody>
+	</table>
+</div>
+
+<div id="mealForm" class="form ajax" style="width:400px;min-height:100px;">
+<form method="post" onsubmit="return saveMeal(this, true);" id="mealFrm">
+<input type="hidden" name="id">
+<input type="hidden" name="year" data-bind="value: viewModel.year">
+<input type="hidden" name="month" data-bind="value: viewModel.month">
+<input type="hidden" name="week" data-bind="value: viewModel.cur_week">
+<input type="hidden" name="date">
+<input type="hidden" name="col">
+<input type="hidden" name="save_meal" value="1">
+    <div><label for="@name">Meal:</label> <input type="text" name="name"> <!-- onblur="saveMeal(this.form);"-->    
+    <span id="nameError" style="color:red;"></span></div>
+    <p><a href="#" onclick="$('#mealDetails').toggle();return false;">+ optional details (recipe, ingreditents, calories)</a></p>
+    <div style="display:none;" id="mealDetails">
+        <div><label>Recipe:</label> <textarea name="recipe"></textarea></div>
+        <div><label>Or recipe URL:</label>
+        <input type="text" name="link"></div>
+        <div><label>Calories per serving:</label>
+        <input type="text" name="calories"></div>
+        <div><label for="@ingredients">Ingredients:</label> <textarea name="ingredients"></textarea></div>
+        <p><a href="#" onclick="parseGrocery();return false"> Add ingredients to grocery list</a></p>
+    </div>
+    <div align="center"><input type="submit" value="Save Meal">
+    <input type="button" value="Delete Meal" onclick="deleteMeal(this.form);">
+    <input type="button" value="Cancel" onclick="$('#mealForm').hide();"></div>
+</form>
+</div>
+
+<div id="mealInfo" class="form ajax" style="width:400px;min-height:100px;">
+    <div id="loadingMealInfo" style="display:none;">Loading...</div>
+    <h2 id="mealName"></h2>
+    <div id="mealRecipe"></div>
+    <p id="mealLink"></p>
+    <div id="mealIngredients">    
+    </div>
+    
+    <p id="mealCalories"></p>
+    
+    <div align="center" id="mealButtons">
+    <input type="button" value="Close details" onclick="$('#mealInfo').hide();">
+    <input type="button" value="Change Meal" onclick="$('#mealInfo').hide();centerElt('mealForm',400,200);">
+    <input type="button" value="Delete Meal" onclick="deleteMeal(this.form);"></div>
+</div>
+
+<div id="groceryToAdd" class="form ajax" style="width:500px;min-height:200px;background:#ED9121;">
+    <div id="loadingGroceryToAdd" style="display:none;">Loading...</div>
+    <h2>Grocery Items to Add</h2>
+    
+    <div data-bind="template: 'groceryToAddTemplate'"></div>    
+    
+    <div><input type="button" value="Add Checked Items To Grocery List" onclick="viewModel.addToGrocery();">
+    <input type="button" value="Cancel" onclick="$('#groceryToAdd').hide();"></div>
+</div>
+
+<script id='groceryToAddTemplate' type="text/html">
+<form id="groceryToAddForm">
+<table class="table">
+    <tr><th>&nbsp;</th><th>Qty</th><th>Measure</th><th>Ingredient</th></tr>
+    {{each viewModel.meal_grocery}}
+    <tr><td><input type="checkbox" name="i[]" value="${ this.i }" checked="true"></td>
+    <td><input thype="text" size="4" name="qty[]" value="${ this.qty }"></td>
+    <td><input thype="text" size="10" name="measure[]" value="${ this.measure }"></td>
+    <td><input thype="text" size="20" name="item[]" value="${ this.item }"></td></tr>
+   {{/each}}
+</table>
+</form>
+</script>
+
+<script id='weeksTemplate' type='text/html'>    
+        Weeks: {{each viewModel.weeks}}                    
+               <a href="#" {{if this.active}}style="color:red;font-weight:bold;"{{/if}} onclick="viewModel.changeWeek(${ this.i });return false;">[${ this.i }]</a>
+        {{/each}}
+</script>
+    
+<script id='calendarTemplate' type='text/html'>    
+<table class="calendar"><tr><th>Date</th>
+{{each viewModel.columns}}
+    <th>${ this.name}</th>
+{{/each}}
+</tr>
+{{each viewModel.dates}}
+    <tr><td class="date">${ this.date }</td>    
+    <!--${d=this.mysqldate}-->
+    {{each this.columns}}
+        <!--${col=this.name}-->
+        <td><div style="float:right;"><a style="text-decoration:none;font-weight:bold;" href="#" onclick="showMeal(event, 0,'${ d }','${ this.name }','form');return false;">+</a></div>
+        {{each this.meals}}
+            <p><a href="#" onclick="showMeal(event, '${ this.id }','${ d }','${ col }','details');return false;">${ this.name }</a></p>
+        {{/each}}</td>
+    {{/each}}
+    </tr>
+{{/each}}
+</table>
+</script>
+
+<script id="groceryTemplate" type="text/html">
+<tr><td>${ total_qty } ${ unit } ${ item }</td><td style="text-align:center;" align="center"><input type="checkbox" onclick="buyGrocery('${ item }', this);" {{if is_available}}checked{{/if}}></td></tr>
+</script>
+
+<script type="text/javascript">
+var viewModel={};
+
+$.getJSON("<?=SITE_URL?>?action=pyrostia_ajax",function(data){      
+    viewModel = ko.mapping.fromJS(data.calendar);        
+   
+    viewModel.moveCalendar = function(dir)
+    {        
+        if(dir=='backward') data={"year": this.prev_year(), "month": this.prev_month()};
+        else data={"year": this.next_year(), "month": this.next_month()};
+        
+        $.ajax({
+            url: "<?=SITE_URL?>?action=pyrostia_ajax",
+            type: "post",
+            async: false,
+            data: "year="+data.year+"&month="+data.month,
+            success: function(msg){
+                json=$.parseJSON(msg);            
+                ko.mapping.updateFromJS(viewModel, json.calendar);                
+            }
+        });
+    }
+    
+    viewModel.changeWeek = function(week)
+    {     
+        data={week: week, year:this.year(), month:this.month()};
+        $.post("<?=SITE_URL?>?action=pyrostia_ajax",data,function(msg){ 
+            json=$.parseJSON(msg);            
+            ko.mapping.updateFromJS(viewModel, json.calendar);    
+        });
+    }
+   
+    viewModel.groceries=ko.observableArray();
+    viewModel.meal_grocery=ko.observableArray();
+
+	// refresh grocery list
+	ko.mapping.updateFromJS(viewModel, data.calendar);  
+    
+    viewModel.addToGrocery=function()
+    {
+        json=$('#groceryToAddForm').serialize();
+        /*data={"request":json, week: viewModel.cur_week(), month: viewModel.month(), year: viewModel.year(), add_to_grocery: 1, meal_id: mealModel.id()};
+        $.post("<?=SITE_URL?>?action=pyrostia_ajax",data,function(msg){
+            json=$.parseJSON(msg);
+            console.log(json);
+            ko.mapping.updateFromJS(viewModel, json.calendar);   
+        });*/
+        $.ajax({
+            type: "post",
+            url: "<?=SITE_URL?>?action=pyrostia_ajax",
+            data: "week="+viewModel.cur_week()+"&month="+viewModel.month()+
+                "&year="+viewModel.year()+"&add_to_grocery=1&meal_id="+$('#mealFrm input[name=id]').val()
+                    +"&"+json,
+            success: function(msg)
+            {
+                json=$.parseJSON(msg);
+                console.log(json);
+                ko.mapping.updateFromJS(viewModel, json.calendar);   
+                $('#groceryToAdd').hide('slow');
+            }                
+        });
+    }
+   
+    ko.applyBindings(viewModel);     
+});
+
+saveMeal=function(frm, hide)
+{
+    hide=hide || false;
+    
+    if(frm.name.value=="")
+    {
+        $('#nameError').text("Please enter name");        
+        frm.name.focus();
+        return false;
+    }
+    
+    data=$(frm).serialize();        
+            
+    $.post("<?=SITE_URL?>?action=pyrostia_ajax",data,function(msg){
+        json=$.parseJSON(msg);            
+        ko.mapping.updateFromJS(viewModel, json.calendar);   
+        // ko.mapping.updateFromJS(mealModel, json.meal);   
+        
+        if(hide) $('#mealForm').hide(); 
+    });
+    
+    return false;
+}
+
+deleteMeal=function(frm)
+{
+    if(confirm("Are you sure?"))
+    {
+         data={week: viewModel.cur_week(), month: viewModel.month(), year: viewModel.year(), 
+         delete_meal: 1, id:$('#mealFrm input[name=id]').val()}   
+        
+        $.post("<?=SITE_URL?>?action=pyrostia_ajax",data,function(msg){
+            json=$.parseJSON(msg);            
+            ko.mapping.updateFromJS(viewModel, json.calendar);   
+            $('#mealForm').hide(); 
+            $('#mealInfo').hide();
+        });      
+    }    
+}
+
+function showMeal(event,id,date,col,mode)
+{   
+    $('#loadingMealInfo').show();
+    $('#mealButtons').hide();        
+    event.stopPropagation(); 
+           
+    if(mode=='form')
+    {
+        centerElt('mealForm',400,200);
+        $('#mealInfo').hide();    
+    }
+    
+    if(mode=='details')
+    {
+        centerElt('mealInfo',400,200);
+        $('#mealForm').hide();    
+    }    
+        
+    $('#mealFrm input[name=date]').val(date);
+    $('#mealFrm input[name=col]').val(col);    
+
+    if(id==0)
+    {
+        // reset form
+        $('#mealFrm')[0].reset();
+        $('#mealFrm input[name=id]').val('');
+        $('#loadingMealInfo').hide();
+        $('#mealButtons').show();           
+        return false;
+    }
+    
+    data={"id": id, "do": "get_meal"};
+    $.post("<?=SITE_URL?>?action=meals_ajax",data,function(msg)
+    {        
+        meal=$.parseJSON(msg);      
+        
+            $('#mealName').html(meal.name);
+            $('#mealRecipe').html(meal.recipe.replace(/\n/g,"<br />"));
+            $('#mealIngredients').html("<h3>Ingredients:</h3>"+meal.ingredients.replace(/\n/g,"<br />"));
+            $('#mealLink').html("<a href='"+meal.link+"' target='_blank'>"+meal.link+"</a>");
+            if(meal.calories>0)
+            {
+                $('#mealCalories').html(meal.calories+" calories");
+            }
+            else $('#mealCalories').html('');
+        
+            $('#mealFrm input[name=id]').val(meal.id);    
+            $('#mealFrm input[name=link]').val(meal.link);    
+            $('#mealFrm textarea[name=recipe]').val(meal.recipe);                
+            $('#mealFrm textarea[name=ingredients]').val(meal.ingredients);                
+            $('#mealFrm input[name=calories]').val(meal.calories);    
+            $('#mealFrm input[name=name]').val(meal.name);            
+       
+        
+        $('#loadingMealInfo').hide();
+        $('#mealButtons').show();
+    });
+}
+
+parseGrocery=function()
+    {   
+        $('#loadingGroceryToAdd').show();
+        centerElt('groceryToAdd',500,300);
+                
+        data={"do": "parse_ingredients", ingredients: $('#mealFrm textarea[name=ingredients]').val()};
+        
+        $.post("<?=SITE_URL?>?action=meals_ajax", data, function(msg)
+        {
+            $('#loadingGroceryToAdd').hide();
+            json=$.parseJSON(msg);
+            
+            // remove old items in the array
+            viewModel.meal_grocery.splice(0, viewModel.meal_grocery().length);
+                                    
+            for(i=0;i<json.length;i++)
+            {
+               viewModel.meal_grocery.push(json[i]);                
+            }            
+        });
+    }
+
+// to mark grocery from grocery list as bought
+function buyGrocery(item, chk)
+{
+	data={"status": chk.checked?1:0, "item": item, "month": viewModel.month, 
+		"year":viewModel.year, "week": viewModel.cur_week, "buy": 1};	
+	$.post("<?=SITE_URL?>?action=grocery_ajax", data, function(msg){});
+}
+</script>

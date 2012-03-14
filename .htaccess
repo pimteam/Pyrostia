@@ -1,0 +1,42 @@
+Options +FollowSymLinks
+Options -Indexes
+
+<ifmodule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 seconds"
+  ExpiresByType text/html "access plus 7200 seconds"
+  ExpiresByType image/gif "access plus 518400 seconds"
+  ExpiresByType image/jpeg "access plus 518400 seconds"
+  ExpiresByType image/png "access plus 518400 seconds"
+  ExpiresByType text/css "access plus 518400 seconds"
+  ExpiresByType text/javascript "access plus 216000 seconds"
+  ExpiresByType application/x-javascript "access plus 216000 seconds"
+</ifmodule>
+
+<ifmodule mod_headers.c>
+  # Cache specified files for 6 days
+  <filesmatch "\.(ico|flv|jpg|jpeg|png|gif|css|swf)$">
+  Header set Cache-Control "max-age=518400, public"
+  </filesmatch>
+  # Cache HTML files for a couple hours
+  <filesmatch "\.(html|htm)$">
+  Header set Cache-Control "max-age=7200, private, must-revalidate"
+  </filesmatch>
+  # Cache PDFs for a day
+  <filesmatch "\.(pdf)$">
+  Header set Cache-Control "max-age=86400, public"
+  </filesmatch>
+  # Cache Javascripts for 2.5 days
+  <filesmatch "\.(js)$">
+  Header set Cache-Control "max-age=216000, private"
+  </filesmatch>
+</ifmodule>
+
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule   ^([^/]*)/$  index\.php?action=$1
+RewriteRule   ^([^/\.]{1,100})$  index\.php?action=$1
+RewriteRule   ^([^/]*)/(.*)/$  index\.php?action=$1&celeroo_request=$2
+RewriteRule   ^([^/]*)/([^/\.]{1,100})$  index\.php?action=$1&celeroo_request=$2
+</IfModule>

@@ -1,0 +1,21 @@
+<div id="main">
+<h1>Contact Us</h1>
+
+<p>If you have any questions, feedback or propositions you can email us at info@calendarscripts.info or fill the form below:</p>
+
+    <form class="form" id="contactFrm">
+    <div><label>Your email:</label> <input type="text" name="email" class="required email"></div>
+    <div><label>Subject:</label> <input type="text" name="subject" class="required"></div>
+    <div>Message:<br> <textarea name="message" rows="10" cols="60" class="required"></textarea></div>
+    
+    <div><input type="submit" value="Send Email"></div>
+    <input type="hidden" name="ok" value="1">
+    <input type="hidden" name="gender" value="male">
+    </form>
+</div>
+
+<script type="text/javascript">
+$('#contactFrm').validate();
+
+$('#contactFrm input[name=gender]').val('abv475');
+</script>
